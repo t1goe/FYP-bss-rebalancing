@@ -5,7 +5,9 @@ from tqdm import tqdm
 
 # from numba import jit
 
-
+###
+# Reorganise all the dublinbikes CSVs by station instead of by quarter
+###
 def by_station():
     # Get list of data files
     bssfiles = os.listdir('./datasets/bss/dublin')
