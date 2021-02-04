@@ -41,9 +41,9 @@ print(dataset)
 dataset = dataset.drop(dataset[dataset['STATION ID'] != 2].index)
 for date in dataset['DATE'].unique():
     print('Processing date ' + str(date))
-    temp_dataset = dataset.drop(dataset[dataset['DATE'] != date].index)
+    # temp_dataset = dataset.drop(dataset[dataset['DATE'] != date].index)
     # temp_dataset = temp_dataset.head(288)
-    plt.plot(temp_dataset['INT_TIME'], temp_dataset['AVAILABLE BIKES'], label=("Date " + str(date)))
+    # plt.plot(temp_dataset['INT_TIME'], temp_dataset['AVAILABLE BIKES'], label=("Date " + str(date)))
 
 # for station in dataset['STATION ID'].unique()[:5]:
 #     print('Processing station ' + str(station))
@@ -59,8 +59,8 @@ for date in dataset['DATE'].unique():
 # print(dataset)
 #
 # plt.plot(dataset['INT_TIME'], dataset['AVAILABLE BIKES'])
-
-plt.xlabel('Time')
-plt.ylabel('Available bikes')
-
-plt.show()
+#
+# plt.xlabel('Time')
+# plt.ylabel('Available bikes')
+#
+# plt.show()
