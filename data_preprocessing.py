@@ -1,12 +1,16 @@
 import os
 import zipfile
 import wget
+from tqdm import tqdm
+import pandas as pd
 
 
-###
-# Download dublin weather data
-###
+
 def dublin_weather():
+    """
+    Download dublin weather data from met eireann
+    """
+
     destination = './datasets/weather'
     url = "https://cli.fusio.net/cli/climate_data/webdata/hly175.zip"
 
@@ -25,10 +29,10 @@ def dublin_weather():
         print("Dublin weather data already exists\n")
 
 
-###
-# Download dublin bss data
-###
 def dublin_bss():
+    """
+    Download dublin bss data with wget
+    """
     destination = './datasets/bss/dublin'
 
     if not os.path.exists(destination):
@@ -46,16 +50,17 @@ def dublin_bss():
             "/9496fac5-e4d7-4ae9-a49a-217c7c4e83d9/download/dublinbikes_20180701_20181001.csv",
             "/2dec86ed-76ed-47a3-ae28-646db5c5b965/download/dublin.csv"]
 
-    for url in urls:
+    print("Downloading dublinbikes data")
+    for url in tqdm(urls):
         filename = url.split("/")[-1]
         if filename in os.listdir(destination):
-            print("File \"" + filename + "\" already exists")
+            # print("File \"" + filename + "\" already exists")
             continue
 
         final_url = base_url + url
-        print("starting download on " + filename)
+        # print("starting download on " + filename)
         wget.download(final_url, destination)
-        print(filename + " : downloaded\n")
+        # print(filename + " : downloaded\n")
 
     print("Finished downloading Dublin BSS data")
 
@@ -63,3 +68,51 @@ def dublin_bss():
     for file in os.listdir():
         if file[-4:] == ".tmp":
             os.remove(file)
+
+def organise_by_station():
+    """
+    Reorganise all the dublinbikes CSVs by station instead of by quarter
+    """
+    # Get list of data files
+    bss_files = os.listdir('./datasets/bss/dublin')
+    if 'dublin.csv' in bss_files:
+        bss_files.remove('dublin.csv')
+
+    if 'reorg' in bss_files:
+        bss_files.remove('reorg')
+
+    # Get all the station IDs
+    dataset = pd.read_csv('./datasets/bss/dublin/dublin.csv',
+                          usecols=['Number'])
+    station_ids = []
+    for d in dataset['Number'].unique():
+        station_ids.append(d)
+    station_ids.sort()
+
+    # Get column names
+    columns = pd.read_csv('./datasets/bss/dublin/dublinbikes_20200701_20201001.csv', nrows=1).columns
+
+    # Create the directory if it does not exist
+    destination = './datasets/bss/dublin/reorg'
+    if not os.path.exists(destination):
+        os.makedirs(destination)
+
+    loading_wheel = ['|', '/', '-', '\\']
+    i = 0
+    print("Starting dublinbikes reorganisation")
+    for station in station_ids:
+        if os.path.exists('./datasets/bss/dublin/reorg/station_' + str(station) + '.csv'):
+            # print('\tStation CSV already exists')
+            continue
+
+        # print('Working on station: ' + str(station) + loading_wheel[i], end='\r')
+        print('Working on station: ' + str(station))
+        df1 = pd.DataFrame(columns=columns)
+        for file in bss_files:
+            df2 = pd.read_csv('./datasets/bss/dublin/' + str(file))
+            df2 = df2[df2['STATION ID'] == station]
+            temp = [df1, df2]
+            df1 = pd.concat(temp)
+        df1 = df1.drop(df1.columns[[0]], axis=1)
+        df1.to_csv('./datasets/bss/dublin/reorg/station_' + str(station) + '.csv', index=False)
+    print('\nFinished dublinbikes reorganisation')
