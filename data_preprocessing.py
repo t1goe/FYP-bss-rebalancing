@@ -1,9 +1,10 @@
 import os
+import warnings
 import zipfile
 import wget
+from pandas.errors import DtypeWarning
 from tqdm import tqdm
 import pandas as pd
-
 
 
 def dublin_weather():
@@ -69,6 +70,7 @@ def dublin_bss():
         if file[-4:] == ".tmp":
             os.remove(file)
 
+
 def organise_by_station():
     """
     Reorganise all the dublinbikes CSVs by station instead of by quarter
@@ -97,8 +99,6 @@ def organise_by_station():
     if not os.path.exists(destination):
         os.makedirs(destination)
 
-    loading_wheel = ['|', '/', '-', '\\']
-    i = 0
     print("Starting dublinbikes reorganisation")
     for station in station_ids:
         if os.path.exists('./datasets/bss/dublin/reorg/station_' + str(station) + '.csv'):
@@ -114,5 +114,23 @@ def organise_by_station():
             temp = [df1, df2]
             df1 = pd.concat(temp)
         df1 = df1.drop(df1.columns[[0]], axis=1)
+        df1 = df1.drop(['LAST UPDATED', 'NAME', 'STATUS', 'ADDRESS', 'LATITUDE', 'LONGITUDE'], axis=1)
+
         df1.to_csv('./datasets/bss/dublin/reorg/station_' + str(station) + '.csv', index=False)
+
     print('\nFinished dublinbikes reorganisation')
+
+
+def clean_weather_data():
+    # Remove first n rows, that contain data from before the start of the BSS data
+    with open('./datasets/weather/hly175/hly175.csv', 'r') as fin:
+        data = fin.read().splitlines(True)
+    with open('./datasets/weather/hly175/hly175clean.csv', 'w') as fout:
+        fout.writelines(data[15])
+        fout.writelines(data[131319:])
+
+    # Remove all rows with non-useful data
+    warnings.filterwarnings("ignore", category=DtypeWarning)
+    dataset = pd.read_csv('./datasets/weather/hly175/hly175clean.csv',
+                          usecols=['date', 'ind', 'rain', 'temp', 'rhum'])
+    dataset.to_csv('./datasets/weather/hly175/hly175clean.csv', index=False)
