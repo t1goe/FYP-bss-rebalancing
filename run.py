@@ -1,66 +1,38 @@
-import pandas
+import math
+import os
+import time
+
+import pandas as pd
 import matplotlib.pyplot as plt
-import data_dl
+import data_preprocessing
+import pandas as pd
+import numpy as np
+
+from calendar import timegm
 
 
-def convert_time(x):
-    a = x.split(' ')
-    a = a[1].split(':')
+def attach_weather_data(x):
+    if 'TIME' not in x.columns:
+        print('TIME column not present')
+        return
 
-    ans = (int(a[0]) * 12) + (int(a[1]) / 5)
+    weather = pd.read_csv('datasets/weather/hly175/hly175clean.csv')
 
-    return ans
-
-
-def convert_date(x, start_date):
-    a = x.split(' ')
-    a = a[0].split('-')
-
-    start = start_date.split(' ')
-    start = start[0].split('-')
+    utc_time = time.strptime("08-aug-2018 03:00", "%d-%b-%Y %H:%M")
+    print(utc_time)
+    # epoch_time = timegm(utc_time)
+    # -> 1236472051
 
 
-data_dl.dublin_weather()
-data_dl.dublin_bss()
+dataset = pd.read_csv('datasets/bss/dublin/reorg/station_2.csv', usecols=['TIME', 'AVAILABLE BIKES'])
+dataset.columns = ['TIME', 'BIKES']
 
-dataset = pandas.read_csv('./datasets/bss/dublin/dublinbikes_20200701_20201001.csv',
-                          usecols=['STATION ID', 'TIME', 'AVAILABLE BIKES'])
+# dataset['bikes(t-1)'] = dataset['bikes'].shift(1)
 
-date_list = []
-for d in dataset['TIME'].unique():
-    if not d.split(' ')[0] in date_list:
-        date_list.append(d.split(' ')[0])
+# attach_weather_data(dataset)
 
-date_list.sort()
+utc_time = time.strptime("08-aug-2018 03:00", "%d-%b-%Y %H:%M")
+# utc_time.
+print(utc_time)
 
-dataset['INT_TIME'] = dataset['TIME'].apply(lambda x: convert_time(x))
-dataset['DATE'] = dataset['TIME'].apply(lambda x: x.split()[0])
-print(dataset)
-
-# print(dataset['STATION ID'].unique())
-dataset = dataset.drop(dataset[dataset['STATION ID'] != 2].index)
-for date in dataset['DATE'].unique():
-    print('Processing date ' + str(date))
-    # temp_dataset = dataset.drop(dataset[dataset['DATE'] != date].index)
-    # temp_dataset = temp_dataset.head(288)
-    # plt.plot(temp_dataset['INT_TIME'], temp_dataset['AVAILABLE BIKES'], label=("Date " + str(date)))
-
-# for station in dataset['STATION ID'].unique()[:5]:
-#     print('Processing station ' + str(station))
-#     temp_dataset = dataset.drop(dataset[dataset['STATION ID'] != station].index)
-#     temp_dataset = temp_dataset.head(288)
-#     plt.plot(temp_dataset['INT_TIME'], temp_dataset['AVAILABLE BIKES'], label=("Station " + str(station)))
-
-# dataset = dataset.drop(dataset[dataset['STATION ID'] != 2].index)
-#
-#
-# dataset.drop(['STATION ID'], axis=1)
-#
 # print(dataset)
-#
-# plt.plot(dataset['INT_TIME'], dataset['AVAILABLE BIKES'])
-#
-# plt.xlabel('Time')
-# plt.ylabel('Available bikes')
-#
-# plt.show()
