@@ -1,4 +1,5 @@
 import os
+import time
 import warnings
 import zipfile
 import wget
@@ -34,7 +35,7 @@ def dublin_bss():
     """
     Download dublin bss data with wget
     """
-    destination = './datasets/bss/dublin'
+    destination = './datasets/bss/dublin/original/'
 
     if not os.path.exists(destination):
         os.makedirs(destination)
@@ -76,7 +77,7 @@ def organise_by_station():
     Reorganise all the dublinbikes CSVs by station instead of by quarter
     """
     # Get list of data files
-    bss_files = os.listdir('./datasets/bss/dublin')
+    bss_files = os.listdir('./datasets/bss/dublin/original')
     if 'dublin.csv' in bss_files:
         bss_files.remove('dublin.csv')
 
@@ -84,7 +85,7 @@ def organise_by_station():
         bss_files.remove('reorg')
 
     # Get all the station IDs
-    dataset = pd.read_csv('./datasets/bss/dublin/dublin.csv',
+    dataset = pd.read_csv('datasets/bss/dublin/original/dublin.csv',
                           usecols=['Number'])
     station_ids = []
     for d in dataset['Number'].unique():
@@ -92,7 +93,7 @@ def organise_by_station():
     station_ids.sort()
 
     # Get column names
-    columns = pd.read_csv('./datasets/bss/dublin/dublinbikes_20200701_20201001.csv', nrows=1).columns
+    columns = pd.read_csv('datasets/bss/dublin/original/dublinbikes_20200701_20201001.csv', nrows=1).columns
 
     # Create the directory if it does not exist
     destination = './datasets/bss/dublin/reorg'
@@ -109,7 +110,7 @@ def organise_by_station():
         print('Working on station: ' + str(station))
         df1 = pd.DataFrame(columns=columns)
         for file in bss_files:
-            df2 = pd.read_csv('./datasets/bss/dublin/' + str(file))
+            df2 = pd.read_csv('./datasets/bss/dublin/original/' + str(file))
             df2 = df2[df2['STATION ID'] == station]
             temp = [df1, df2]
             df1 = pd.concat(temp)
@@ -127,10 +128,13 @@ def clean_weather_data():
         data = fin.read().splitlines(True)
     with open('./datasets/weather/hly175/hly175clean.csv', 'w') as fout:
         fout.writelines(data[15])
-        fout.writelines(data[131319:])
+        fout.writelines(data[131152:])
 
     # Remove all rows with non-useful data
     warnings.filterwarnings("ignore", category=DtypeWarning)
     dataset = pd.read_csv('./datasets/weather/hly175/hly175clean.csv',
-                          usecols=['date', 'ind', 'rain', 'temp', 'rhum'])
+                          usecols=['date', 'rain', 'temp', 'rhum'])
+
+    # dataset["epoch"] = dataset["date"].apply(lambda x: int(time.mktime(time.strptime(x, "%d-%b-%Y %H:%M"))))
+
     dataset.to_csv('./datasets/weather/hly175/hly175clean.csv', index=False)
