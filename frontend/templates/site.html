@@ -1,28 +1,34 @@
 <!doctype html>
 <html>
+   <head>
+      <script type = "text/javascript" src = "{{url_for('static', filename='scripts.js')}}" ></script>
+   </head>
    <body>
       <form action = "http://localhost:5000/" method = "get">
-         <br>
+
          <p>station_id</p>
          <p><input type = "text" name = "station_id" /></p>
-         <br>
+
          <p>int_time</p>
          <p><input type = "text" name = "int_time" /></p>
-         <br>
+
          <p>int_date</p>
          <p><input type = "text" name = "int_date" /></p>
-         <br>
+
          <p>int_day</p>
          <p><input type = "text" name = "int_day" /></p>
-         <br>
-         <p>rain</p>
-         <p><input type = "text" name = "rain" /></p>
-         <br>
-         <p>temp</p>
-         <p><input type = "text" name = "temp" /></p>
-         <br>
-         <p>rhum</p>
-         <p><input type = "text" name = "rhum" /></p>
+         <div id="hidden_fields">
+            <p>rain</p>
+            <p><input type = "text" id="hidden_field" name = "rain" /></p>
+
+            <p>temp</p>
+            <p><input type = "text" name = "temp" /></p>
+
+            <p>rhum</p>
+            <p><input type = "text" name = "rhum" /></p>
+         </div>
+         <input type="checkbox" id="trigger" name="question" onclick="hider()">
+
          <p><input type = "submit" value = "submit" /></p>
       </form>
 
