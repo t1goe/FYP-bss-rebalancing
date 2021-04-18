@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+   <body>
+      <form action = "http://localhost:5000/" method = "get">
+         <br>
+         <p>station_id</p>
+         <p><input type = "text" name = "station_id" /></p>
+         <br>
+         <p>int_time</p>
+         <p><input type = "text" name = "int_time" /></p>
+         <br>
+         <p>int_date</p>
+         <p><input type = "text" name = "int_date" /></p>
+         <br>
+         <p>int_day</p>
+         <p><input type = "text" name = "int_day" /></p>
+         <br>
+         <p>rain</p>
+         <p><input type = "text" name = "rain" /></p>
+         <br>
+         <p>temp</p>
+         <p><input type = "text" name = "temp" /></p>
+         <br>
+         <p>rhum</p>
+         <p><input type = "text" name = "rhum" /></p>
+         <p><input type = "submit" value = "submit" /></p>
+      </form>
+
+      {% if result!=None %}
+         <h1>Result is {{result}}</h1>
+      {% endif %}
+   </body>
+</html>
