@@ -10,8 +10,12 @@
    <div class="container">
       <form action = "http://localhost:5000/" method = "get">
          <div class="form-group">
-            <label class="control-label" for="station_id">Station ID</label>
-            <input type="text" class="form-control" name="station_id" id="station_id"/>
+            <label class="control-label" for="station_id">Station</label>
+            <select class="form-control" id="station_id" name="station_id">
+               {% for key, value in station_info.items() %}
+                  <option value="{{ key }}">{{ value }}</option>
+               {% endfor %}
+            </select>
          </div>
          <div class="form-group">
             <label class="control-label" for="int_time">int_time</label>

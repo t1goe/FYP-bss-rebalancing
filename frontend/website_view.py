@@ -1,4 +1,7 @@
 import pickle
+from os import listdir
+from os.path import isfile, join
+import csv
 
 from flask import Flask, render_template, request
 import tensorflow as tf
@@ -13,8 +16,10 @@ app = Flask(__name__)
 
 @app.route('/', methods=['POST', 'GET'])
 def display():
+    stations = get_station_names()
+
     if request.args.get('station_id') is None:
-        return render_template('site.html', result=None)
+        return render_template('site.html', station_info=stations, result=None)
     else:
 
         if request.args.get('simple') is None:
@@ -32,12 +37,29 @@ def display():
                 request.args.get('station_id'),
                 request.args.get('int_time'),
                 request.args.get('int_date'),
-                request.args.get('int_day'),
+                request.args.get('int_day')
             )
         else:
             answer = 0
 
-        return render_template('site.html', result=answer)
+        return render_template('site.html', station_info=stations, result=answer)
+
+
+def get_station_names():
+    mypath = '../datasets/bss/dublin/ml_models/'
+    files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+
+    station_ids = [x.split('.')[0].split('_')[1] for x in files]
+
+    output = {}
+
+    for sid in station_ids:
+        csv_file = csv.reader(open('../datasets/bss/dublin/original/dublin.csv', "r"), delimiter=",")
+        for row in csv_file:
+            if sid == row[0]:
+                output[sid] = row[1]
+
+    return output
 
 
 def simple_predict(station_id, int_time, int_date, int_day):
