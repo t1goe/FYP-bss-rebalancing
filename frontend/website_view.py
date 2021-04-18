@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import math
 import pickle
 from os import listdir
 from os.path import isfile, join
@@ -17,6 +20,13 @@ app = Flask(__name__)
 @app.route('/', methods=['POST', 'GET'])
 def display():
     stations = get_station_names()
+    sorted(stations.keys(), key=lambda x: x.lower())
+    if request.args.get('datetime') is not None:
+        dt = request.args.get('datetime')
+        print(dt)
+        print(convert_time(dt))
+        print(convert_date(dt))
+        print(convert_day(dt))
 
     if request.args.get('station_id') is None:
         return render_template('site.html', station_info=stations, result=None)
@@ -25,9 +35,9 @@ def display():
         if request.args.get('simple') is None:
             answer = full_predict(
                 request.args.get('station_id'),
-                request.args.get('int_time'),
-                request.args.get('int_date'),
-                request.args.get('int_day'),
+                convert_time(dt),
+                convert_date(dt),
+                convert_day(dt),
                 request.args.get('rain'),
                 request.args.get('temp'),
                 request.args.get('rhum')
@@ -35,14 +45,54 @@ def display():
         elif request.args.get('simple') == 'on':
             answer = simple_predict(
                 request.args.get('station_id'),
-                request.args.get('int_time'),
-                request.args.get('int_date'),
-                request.args.get('int_day')
+                convert_time(dt),
+                convert_date(dt),
+                convert_day(dt)
             )
         else:
             answer = 0
 
         return render_template('site.html', station_info=stations, result=answer)
+
+
+def convert_time(x):
+    """
+    Converts TIME field in the CSV to an integer representing
+    what time of day it is (in number of 5min increments) from 0 to 287
+    eg
+    - 00:00 -> 0
+    - 00:10 -> 2
+    - 02:20 -> 28
+    etc
+    """
+    a = x.split('T')
+    a = a[1].split(':')
+
+    ans = math.floor((int(a[0]) * 12) + (int(a[1]) / 5))
+
+    return ans
+
+
+def convert_date(x):
+    """
+    Converts TIME field to an integer representing the day of the year
+
+    eg
+    - 2019-02-10 -> 41
+    """
+    current_date = datetime.strptime(x, "%Y-%m-%dT%H:%M")
+    return current_date.strftime('%j')
+
+
+def convert_day(x):
+    """
+    Converts TIME field to an integer representing the day of the week
+
+    eg
+    - 2019-02-10 -> 0 (Sunday)
+    """
+    current_date = datetime.strptime(x, "%Y-%m-%dT%H:%M")
+    return current_date.strftime('%w')
 
 
 def get_station_names():
