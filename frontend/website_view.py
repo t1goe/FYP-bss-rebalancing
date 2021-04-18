@@ -17,20 +17,53 @@ def display():
         return render_template('site.html', result=None)
     else:
         # station_id, int_time, int_date, int_day, rain, temp, rhum
-        answer = full_predict(
-            request.args.get('station_id'),
-            request.args.get('int_time'),
-            request.args.get('int_date'),
-            request.args.get('int_day'),
-            request.args.get('rain'),
-            request.args.get('temp'),
-            request.args.get('rhum'),
-        )
+
+        if request.args.get('simple') is None:
+            answer = full_predict(
+                request.args.get('station_id'),
+                request.args.get('int_time'),
+                request.args.get('int_date'),
+                request.args.get('int_day'),
+                request.args.get('rain'),
+                request.args.get('temp'),
+                request.args.get('rhum')
+            )
+        elif request.args.get('simple') == 'on':
+            answer = simple_predict(
+                request.args.get('station_id'),
+                request.args.get('int_time'),
+                request.args.get('int_date'),
+                request.args.get('int_day'),
+            )
+        else:
+            answer = 0
+
         return render_template('site.html', result=answer)
 
 
-def simple_predict():
-    print()
+def simple_predict(station_id, int_time, int_date, int_day):
+    destination_directory = '../datasets/bss/dublin/simple_ml_models/'
+    scaler_destination_directory = copy.deepcopy(destination_directory) + 'scalers/'
+
+    model = tf.keras.models.load_model(destination_directory + 'station_' + str(station_id) + '.h5')
+
+    file = open(scaler_destination_directory + 'station_' + str(station_id) + '.pkl', "rb")
+    scaler = pickle.load(file)
+    file.close()
+
+    params = np.array([0, int_time, int_date, int_day])
+    params = params.reshape(1, -1)
+    params = scaler.transform(params)
+    params = np.array([params])
+    params = params.tolist()
+    params[0][0].pop(0)
+    params = np.array(params)
+
+    answer = model.predict(params)
+    full_row = concatenate((answer, params[0]), axis=1)
+    inv_row = scaler.inverse_transform(full_row)
+    # print(inv_row[0][0])
+    return inv_row[0][0]
 
 
 def full_predict(station_id, int_time, int_date, int_day, rain, temp, rhum):
@@ -54,7 +87,7 @@ def full_predict(station_id, int_time, int_date, int_day, rain, temp, rhum):
     answer = model.predict(params)
     full_row = concatenate((answer, params[0]), axis=1)
     inv_row = scaler.inverse_transform(full_row)
-    print(inv_row[0][0])
+    # print(inv_row[0][0])
     return inv_row[0][0]
 
 
