@@ -23,10 +23,10 @@ def display():
     sorted(stations.keys(), key=lambda x: x.lower())
     if request.args.get('datetime') is not None:
         dt = request.args.get('datetime')
-        print(dt)
-        print(convert_time(dt))
-        print(convert_date(dt))
-        print(convert_day(dt))
+        # print(dt)
+        # print(convert_time(dt))
+        # print(convert_date(dt))
+        # print(convert_day(dt))
 
     if request.args.get('station_id') is None:
         return render_template('site.html', station_info=stations, result=None)
@@ -52,7 +52,12 @@ def display():
         else:
             answer = 0
 
-        return render_template('site.html', station_info=stations, result=answer)
+        answer = round(answer)
+        return render_template('site.html',
+                               station_info=stations,
+                               current_station_name=stations[request.args.get('station_id')],
+                               current_time_info=request.args.get('datetime'),
+                               result=answer)
 
 
 def convert_time(x):
