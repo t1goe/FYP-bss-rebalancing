@@ -16,7 +16,6 @@ def display():
     if request.args.get('station_id') is None:
         return render_template('site.html', result=None)
     else:
-        # station_id, int_time, int_date, int_day, rain, temp, rhum
 
         if request.args.get('simple') is None:
             answer = full_predict(

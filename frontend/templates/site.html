@@ -1,39 +1,55 @@
 <!doctype html>
 <html>
    <head>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
       <script type = "text/javascript" src = "{{url_for('static', filename='scripts.js')}}" ></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
    </head>
    <body>
+   <div class="container">
       <form action = "http://localhost:5000/" method = "get">
-
-         <p>station_id</p>
-         <p><input type = "text" name = "station_id" /></p>
-
-         <p>int_time</p>
-         <p><input type = "text" name = "int_time" /></p>
-
-         <p>int_date</p>
-         <p><input type = "text" name = "int_date" /></p>
-
-         <p>int_day</p>
-         <p><input type = "text" name = "int_day" /></p>
-         <div id="hidden_fields">
-            <p>rain</p>
-            <p><input type = "text" id="hidden_field" name = "rain" /></p>
-
-            <p>temp</p>
-            <p><input type = "text" name = "temp" /></p>
-
-            <p>rhum</p>
-            <p><input type = "text" name = "rhum" /></p>
+         <div class="form-group">
+            <label class="control-label" for="station_id">Station ID</label>
+            <input type="text" class="form-control" name="station_id" id="station_id"/>
          </div>
-         <input type="checkbox" id="trigger" name="simple" onclick="hider()">
-
-         <p><input type = "submit" value = "submit" /></p>
+         <div class="form-group">
+            <label class="control-label" for="int_time">int_time</label>
+            <input type="text" class="form-control" name="int_time" id="int_time"/>
+         </div>
+         <div class="form-group">
+            <label class="control-label " for="int_date">int_date</label>
+            <input type = "text" class="form-control" name="int_date" id="int_date"/>
+         </div>
+         <div class="form-group">
+            <label class="control-label " for="int_day">int_day</label>
+            <input type="text" class="form-control" name="int_day" id="int_day"/>
+         </div>
+         <div id="hidden_fields">
+            <div class="form-group">
+               <label class="control-label " for="rain">rain</label>
+               <input type="text" class="form-control" name="rain" id="rain"/>
+            </div>
+            <div class="form-group">
+               <label class="control-label " for="temp">temp</label>
+               <input type="text" class="form-control" name="temp" id="temp"/>
+            </div>
+            <div class="form-group">
+               <label class="control-label " for="rhum">rhum</label>
+               <input type="text" class="form-control" name="rhum" id="rhum"/>
+            </div>
+         </div>
+            <div class="checkbox">
+               <label><input type="checkbox" id="simple" name="simple" onclick="hider()">Simple</label>
+            </div>
+         <div class="form-group">
+            <button type="submit" class="btn btn-default">Submit</button>
+         </div>
       </form>
 
       {% if result!=None %}
          <h1>Result is {{result}}</h1>
       {% endif %}
+   </div>
    </body>
 </html>
