@@ -60,6 +60,47 @@ def display():
                                result=answer)
 
 
+@app.route('/list', methods=['POST', 'GET'])
+def list():
+    stations = get_station_names()
+    print(stations)
+
+    sorted(stations.keys(), key=lambda x: x.lower())
+    if request.args.get('date') is not None:
+        dt = request.args.get('date')
+        # print(dt)
+        # print(convert_time(dt))
+        # print(convert_date(dt))
+        # print(convert_day(dt))
+
+    if request.args.get('date') is None:
+        return render_template('list.html',
+                               station_info=stations,
+                               result=None)
+    else:
+        answers = {}
+        for x in range(24):
+            answers[str(x) + ":00"] = (
+                round(
+                    simple_predict(
+                        request.args.get('station_id'),
+                        (x * 12),
+                        convert_date(dt + 'T00:00'),
+                        convert_day(dt + 'T00:00')
+                    )
+                )
+            )
+
+    print(answers)
+
+    return render_template('list.html',
+                           station_info=stations,
+                           current_station_name=stations[request.args.get('station_id')],
+                           current_date_info=request.args.get('date'),
+                           result=answers
+                           )
+
+
 def convert_time(x):
     """
     Converts TIME field in the CSV to an integer representing
@@ -168,6 +209,6 @@ def full_predict(station_id, int_time, int_date, int_day, rain, temp, rhum):
 
 
 if __name__ == '__main__':
-    full_predict(2, 24, 213, 4, 0, 14, 87)
+    # full_predict(2, 24, 213, 4, 0, 14, 87)
     # station_id, int_time, int_date, int_day, rain, temp, rhum
     app.run(debug=True)

@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <title>Dublin Bikes Prediction</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script type="text/javascript" src="{{url_for('static', filename='scripts.js')}}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <form action="http://localhost:5000/list" method="get">
+        <div class="form-group">
+            <label class="control-label" for="station_id">Station</label>
+            <select class="form-control" id="station_id" name="station_id">
+                {% for key, value in station_info.items() %}
+                <option value="{{ key }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="date" class="col-2 col-form-label">Date</label>
+            <input class="form-control" type="date" value="2019-08-01" id="date" name="date">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+    </form>
+
+    {% if result!=None %}
+    <h1>Result</h1>
+    <h1>This is the estimated population of station: {{ current_station_name }} over the course of {{ current_date_info }}</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            {% for key, value in result.items() %}
+                <th scope="col">{{ key }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            {% for key, value in result.items() %}
+                <th>{{ value }}</th>
+            {% endfor %}
+        </tr>
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+</body>
+</html>
