@@ -14,6 +14,8 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from numpy import concatenate
 
+from generate_jobs import generate_jobs
+
 app = Flask(__name__)
 
 
@@ -23,10 +25,6 @@ def display():
     sorted(stations.keys(), key=lambda x: x.lower())
     if request.args.get('datetime') is not None:
         dt = request.args.get('datetime')
-        # print(dt)
-        # print(convert_time(dt))
-        # print(convert_date(dt))
-        # print(convert_day(dt))
 
     if request.args.get('station_id') is None:
         return render_template('site.html', station_info=stations, result=None)
@@ -63,15 +61,10 @@ def display():
 @app.route('/list', methods=['POST', 'GET'])
 def list():
     stations = get_station_names()
-    print(stations)
 
     sorted(stations.keys(), key=lambda x: x.lower())
     if request.args.get('date') is not None:
         dt = request.args.get('date')
-        # print(dt)
-        # print(convert_time(dt))
-        # print(convert_date(dt))
-        # print(convert_day(dt))
 
     if request.args.get('date') is None:
         return render_template('list.html',
@@ -91,14 +84,44 @@ def list():
                 )
             )
 
-    print(answers)
-
     return render_template('list.html',
                            station_info=stations,
                            current_station_name=stations[request.args.get('station_id')],
                            current_date_info=request.args.get('date'),
                            result=answers
                            )
+
+
+@app.route('/jobs', methods=['POST', 'GET'])
+def jobs():
+    if request.args.get('datetime') is None:
+        return render_template('jobs.html',
+                               current_date_info=None,
+                               result=None
+                               )
+    else:
+        input_date = datetime.strptime(request.args.get('datetime'), "%Y-%m-%dT%H:%M")
+        results = generate_jobs(date=input_date)
+        return render_template('jobs.html',
+                               current_date_info=request.args.get('datetime'),
+                               result=convert_results_to_english(results)
+                               )
+
+
+def convert_results_to_english(results):
+    station_names = get_station_names()
+
+    pos = 0
+    for job in results:
+        new_job = (
+            str(job[0]) + " | " + station_names[str(job[0])],
+            str(job[1]) + " | " + station_names[str(job[1])],
+            job[2]
+        )
+        results[pos] = new_job
+        pos += 1
+
+    return results
 
 
 def convert_time(x):
@@ -179,7 +202,6 @@ def simple_predict(station_id, int_time, int_date, int_day):
     answer = model.predict(params)
     full_row = concatenate((answer, params[0]), axis=1)
     inv_row = scaler.inverse_transform(full_row)
-    # print(inv_row[0][0])
     return inv_row[0][0]
 
 
@@ -204,7 +226,6 @@ def full_predict(station_id, int_time, int_date, int_day, rain, temp, rhum):
     answer = model.predict(params)
     full_row = concatenate((answer, params[0]), axis=1)
     inv_row = scaler.inverse_transform(full_row)
-    # print(inv_row[0][0])
     return inv_row[0][0]
 
 

@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+    <title>Dublin Bikes Prediction</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script type="text/javascript" src="{{url_for('static', filename='scripts.js')}}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <form action="http://localhost:5000/jobs" method="get">
+        <div class="form-group">
+            <label for="datetime" class="col-2 col-form-label">Date</label>
+            <input class="form-control" type="datetime-local" value="2019-12-02T13:00" id="datetime" name="datetime">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+    </form>
+
+    {% if result!=None %}
+    <h1>Result</h1>
+    <h1>This is a list of recommended jobs for drivers at time: {{ current_date_info }}</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">From</th>
+            <th scope="col">To</th>
+            <th scope="col">Quantity to move</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for t in result %}
+        <tr>
+            <td>{{ t[0] }}</td>
+            <td>{{ t[1] }}</td>
+            <td>{{ t[2] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+</body>
+</html>
