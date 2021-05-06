@@ -165,7 +165,7 @@ def generate_jobs(date=datetime(year=2019, month=8, day=1, hour=1)):
     if not os.path.exists(destination_file):
         print("File" + destination_file + " does not exist")
         return
-    
+
     time = date.strftime("%#H:00")
     df = pandas.read_csv(destination_file,
                          usecols=['station', time])
