@@ -1,24 +1,17 @@
 from datetime import datetime
 
-import math
 import pickle
 from os import listdir
 from os.path import isfile, join
 import os
 import csv
 
-from flask import Flask, render_template, request
 import tensorflow as tf
-from tensorflow import keras
 import copy
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 from numpy import concatenate
-import warnings
 from tqdm import tqdm
 import pandas
-
-d = datetime(year=2019, month=12, day=3)
 
 
 def get_station_names():
@@ -109,9 +102,6 @@ def generate_report(date=datetime(year=2019, month=8, day=1)):
                     )
                 )
             writer.writerow(answers)
-
-
-# generate_report(d)
 
 
 def get_overunder_population(pop_dict, optimal_capacity, upper_capacity, lower_capacity):
